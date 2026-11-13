@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "_macros.html" as ui %}
+
+{% block content %}
+{% include "sections/hero.html" %}
+
+<div class="moons" aria-hidden="true">
+  <svg width="260" height="28" viewBox="0 0 260 28" fill="none" stroke="#3B2630" stroke-opacity="0.55" stroke-width="1">
+    <circle cx="14" cy="14" r="9"></circle>
+    <path d="M66 5a9 9 0 1 0 0 18a6 9 0 0 1 0-18z" fill="#3B2630" fill-opacity="0.55"></path>
+    <path d="M98 5a9 9 0 1 0 0 18z" fill="#3B2630" fill-opacity="0.55"></path><circle cx="98" cy="14" r="9"></circle>
+    <circle cx="130" cy="14" r="9" fill="#E8B86D" stroke="#E8B86D" stroke-opacity="1"></circle>
+    <path d="M162 5a9 9 0 1 1 0 18z" fill="#3B2630" fill-opacity="0.55"></path><circle cx="162" cy="14" r="9"></circle>
+    <path d="M194 5a9 9 0 1 1 0 18a6 9 0 0 0 0-18z" fill="#3B2630" fill-opacity="0.55"></path>
+    <circle cx="246" cy="14" r="9"></circle>
+  </svg>
+</div>
+
+{% include "sections/practice.html" %}
+{% include "sections/about.html" %}
+{% include "sections/portfolio.html" %}
+{% include "sections/offerings.html" %}
+{% include "sections/booking.html" %}
+{% include "sections/footer.html" %}
+{% endblock %}

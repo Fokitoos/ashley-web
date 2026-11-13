@@ -1,0 +1,23 @@
+<section id="portfolio" class="container section">
+  <div class="section__head">
+    <div class="eyebrow">Portfolio</div>
+    <h2 class="section__title">Moments from the <em>mat.</em></h2>
+    <p class="muted section__intro">Gatherings, classes and ceremonies I’ve had the joy of holding space for.</p>
+  </div>
+
+  <div class="gallery">
+    {% for item in portfolio %}
+    <figure class="tile">
+      <div class="tile__frame">
+        {% if item.src %}
+        <img class="tile__img" src="{{ url_for('static', path=item.src) }}" alt="{{ item.photo_hint }}" loading="lazy">
+        {% else %}
+        {{ ui.photo_icon(34) }}
+        <div class="placeholder-hint">Photo: {{ item.photo_hint }}</div>
+        {% endif %}
+      </div>
+      <figcaption class="tile__caption"><span class="tile__title">{{ item.title }}</span><span class="tile__place">{{ item.caption }}</span></figcaption>
+    </figure>
+    {% endfor %}
+  </div>
+</section>
