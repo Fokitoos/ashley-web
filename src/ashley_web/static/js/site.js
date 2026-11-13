@@ -1,3 +1,5 @@
+import { mountOrb } from './orb.js';
+
 const LOCALE = 'en-GB';
 const SLIDE_INTERVAL_MS = 6000;
 
@@ -35,6 +37,21 @@ function initCarousel(root) {
   root.querySelector('[data-carousel-next]').addEventListener('click', () => go(current + 1));
   dots.forEach((dot, i) => dot.addEventListener('click', () => go(i)));
   restart();
+}
+
+/* ---------- Hero orb ---------- */
+
+function initOrb(root) {
+  const css = getComputedStyle(root);
+  const token = (name) => css.getPropertyValue(name).trim();
+  mountOrb(root, {
+    colors: [token('--accent'), token('--glow'), token('--g4')],
+    // The shader paints this colour wherever the ring is not; the CSS mask on .arch__orb
+    // then fades that fill out so only the ring and its glow sit over the page.
+    backgroundColor: token('--ground'),
+    // The fade-in passes through murky half-transparent greys on a light page.
+    intro: false,
+  });
 }
 
 /* ---------- Booking ---------- */
@@ -209,5 +226,6 @@ function initBooking(root) {
   navigate(null);
 }
 
+document.querySelectorAll('[data-orb]').forEach(initOrb);
 document.querySelectorAll('[data-carousel]').forEach(initCarousel);
 document.querySelectorAll('[data-booking]').forEach(initBooking);
