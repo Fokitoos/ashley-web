@@ -30,6 +30,11 @@ DEFAULT_DB = Path("data/bookings.sqlite3")
 templates = Jinja2Templates(directory=PACKAGE_DIR / "templates")
 
 
+def asset_version(path: str) -> int:
+    """Changes whenever the static file does, so browsers never reuse a stale cached copy."""
+    return (PACKAGE_DIR / "static" / path).stat().st_mtime_ns
+
+
 def create_app(
     store: BookingStore | None = None, today: Callable[[], date] = date.today
 ) -> Starlette:
@@ -46,6 +51,7 @@ def create_app(
                 "portfolio": content.PORTFOLIO,
                 "offerings": content.OFFERINGS,
                 "year": today().year,
+                "asset_version": asset_version,
             },
         )
 

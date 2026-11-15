@@ -54,6 +54,18 @@ function initOrb(root) {
   });
 }
 
+/* ---------- Sticky header ---------- */
+
+function initSiteBar(bar) {
+  // Publish the bar's height so the hero can sit beneath it and anchor jumps clear it.
+  const root = document.documentElement;
+  new ResizeObserver(() => root.style.setProperty('--bar-h', `${bar.offsetHeight}px`)).observe(bar);
+
+  const update = () => bar.classList.toggle('is-scrolled', window.scrollY > 8);
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+}
+
 /* ---------- Booking ---------- */
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -226,6 +238,7 @@ function initBooking(root) {
   navigate(null);
 }
 
+document.querySelectorAll('[data-site-bar]').forEach(initSiteBar);
 document.querySelectorAll('[data-orb]').forEach(initOrb);
 document.querySelectorAll('[data-carousel]').forEach(initCarousel);
 document.querySelectorAll('[data-booking]').forEach(initBooking);
