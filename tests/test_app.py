@@ -1,3 +1,4 @@
+import re
 from datetime import date
 from pathlib import Path
 
@@ -70,6 +71,21 @@ def test_home_page_renders_every_section(client: TestClient) -> None:
 def test_static_assets_are_served(client: TestClient) -> None:
     assert client.get("/static/css/site.css").status_code == 200
     assert client.get("/static/js/site.js").status_code == 200
+
+
+def test_pages_load_nothing_from_other_sites(client: TestClient) -> None:
+    """Fonts, styles and scripts are all served from here, so visitors are not exposed to
+    third parties (and no consent banner is needed for them)."""
+    stylesheet = client.get("/static/css/site.css").text
+    for html in (client.get("/").text, client.get("/book").text, stylesheet):
+        urls = re.findall(r"""(?:href|src)="(https?://[^"]+)"|url\(['"]?(https?://[^'")]+)""", html)
+        outside = [u for pair in urls for u in pair if u and not u.startswith("http://testserver/")]
+        assert outside == []
+
+    fonts = re.findall(r"url\('\.\./(fonts/[^']+)'\)", stylesheet)
+    assert len(fonts) == 6
+    for font in fonts:
+        assert client.get(f"/static/{font}").status_code == 200
 
 
 def test_media_paths_point_at_real_static_files(client: TestClient) -> None:

@@ -79,6 +79,7 @@ uv run pytest
 | `src/ashley_web/app.py` | Routes: `/`, `/book`, `/book/thanks`, `GET /api/availability`, `POST /api/bookings`, `POST /api/ebook`, `POST /api/payments/webhook`. |
 | `src/ashley_web/templates/` | `base.html`, `index.html`, `book.html`, `book_status.html`, one partial per section, shared macros. |
 | `src/ashley_web/static/` | `css/site.css` (design tokens at the top) and `js/site.js` (carousel, booking picker, session quantity, ebook pop-up). |
+| `src/ashley_web/static/fonts/` | Jost and Cormorant Garamond, served from this site instead of Google Fonts so pages load nothing from third parties. Both are under the SIL Open Font License (`OFL-*.txt`). |
 
 To use real photos or video, drop the files under `static/` and set `src` on the matching
 `Slide` or `PortfolioItem` in `content.py`.
