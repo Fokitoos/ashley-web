@@ -10,7 +10,12 @@
       <article class="offering">
         <h3 class="heading-3 offering__title">{{ ui.star() }}<span>{{ offering.title }}</span></h3>
         <p class="muted offering__body">{{ offering.body }}</p>
-        <div class="offering__meta"><span>{{ offering.detail }}</span><span class="offering__price">{{ offering.price }}</span></div>
+        <div class="offering__meta">
+          <span>{{ offering.detail }}</span><span class="offering__price">{{ offering.price }}</span>
+          {% if offering.session in sessions %}
+          <a class="btn btn--primary btn--small" href="{{ url_for('shop') }}">Book now</a>
+          {% endif %}
+        </div>
       </article>
       {% endfor %}
     </div>

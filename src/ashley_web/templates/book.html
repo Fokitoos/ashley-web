@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% import "_macros.html" as ui %}
+
+{% block title %}Book a session · {{ site.name }} Yoga{% endblock %}
+
+{% block content %}
+{% include "sections/header.html" %}
+
+<div class="aura-wrap">
+  {{ ui.aura("book", 3) }}
+
+  <main class="container section">
+    <div class="section__head">
+      <div class="eyebrow">Book a session</div>
+      <h1 class="section__title">Choose your <em>sessions.</em></h1>
+      <p class="muted section__intro section__intro--wide">Choose how many sessions you would like and pay securely online. Once your payment is in, I will email you to find times that suit you.</p>
+    </div>
+
+    <form class="card picker" method="post" action="{{ url_for('shop') }}" data-checkout>
+      <div class="picker__col picker__col--session">
+        <div class="step-label">1 · Your session</div>
+        {% set chosen = form.get("session") or sessions[0].slug %}
+        {% for session in sessions %}
+        <label class="session-option">
+          <input type="radio" name="session" value="{{ session.slug }}" data-price-cents="{{ session.price_cents }}"{% if session.slug == chosen %} checked{% endif %}>
+          <span class="session-option__body">
+            <span class="session-option__title">{{ session.title }}</span>
+            <span class="session-option__meta">{{ session.minutes }} minutes · {{ session.where }}</span>
+            <span class="muted">{{ session.summary }}</span>
+          </span>
+          <span class="session-option__price">{{ session.price_cents|euros }}<small>per session</small></span>
+        </label>
+        {% endfor %}
+      </div>
+
+      <div class="picker__col picker__col--details">
+        <div class="stack">
+          <div class="step-label">2 · How many sessions</div>
+          <div class="quantity">
+            <button class="icon-btn" type="button" aria-label="One session fewer" data-quantity-step="-1">&minus;</button>
+            <input id="bk-quantity" name="quantity" type="number" inputmode="numeric" min="1" max="{{ max_quantity }}" step="1" value="{{ form.get('quantity', '1') }}" aria-label="Number of sessions" required>
+            <button class="icon-btn" type="button" aria-label="One session more" data-quantity-step="1">+</button>
+          </div>
+          <div class="checkout-total" hidden data-total-row>
+            <span>Total</span>
+            <output class="checkout-total__amount" for="bk-quantity" data-total></output>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="step-label">3 · Your details</div>
+          <div class="field">
+            <label for="bk-name">Name</label>
+            <input id="bk-name" name="name" type="text" autocomplete="name" placeholder="Your name" maxlength="120" value="{{ form.get('name', '') }}" required>
+          </div>
+          <div class="field">
+            <label for="bk-email">Email</label>
+            <input id="bk-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="254" value="{{ form.get('email', '') }}" required>
+          </div>
+          {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+          <button class="btn btn--primary btn--submit" type="submit">Continue to payment</button>
+          <p class="times__note">You pay on the next page with iDEAL, card or another method. Payments are handled securely by Mollie.</p>
+        </div>
+      </div>
+    </form>
+  </main>
+</div>
+
+{% include "sections/footer.html" %}
+{% endblock %}
