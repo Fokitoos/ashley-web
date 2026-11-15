@@ -290,7 +290,8 @@ em { font-style: italic; }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; margin-top: 8px; }
 .hero__media { flex: 1 1 380px; min-width: 0; display: flex; justify-content: center; }
 
-.arch { position: relative; width: min(100%, 420px); aspect-ratio: 3 / 4; }
+/* A square stage: the photo circle fills it and the orb ring sits just outside it. */
+.arch { position: relative; width: min(100%, 440px); aspect-ratio: 1; }
 .arch__halo {
   position: absolute;
   inset: -18%;
@@ -300,14 +301,10 @@ em { font-style: italic; }
   animation: breathe 9s ease-in-out infinite;
 }
 .arch__orb {
-  /* The ring is drawn at 80% of this box; the rest is room for its glow. */
+  /* 1.8× the stage, centred on it. The ring's inner edge lands at ~0.3 of this box
+     (0.54 of the stage), just outside the photo circle's 0.5. */
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 190%;
-  aspect-ratio: 1;
-  margin-left: -95%;
-  margin-top: -76%;
+  inset: -40%;
   pointer-events: none;
   mask-image: radial-gradient(circle closest-side, transparent 42%, #000 68%, #000 86%, transparent 97%);
 }
@@ -316,10 +313,10 @@ em { font-style: italic; }
 .carousel {
   position: absolute;
   inset: 0;
-  border-radius: 999px 999px 14px 14px;
+  border-radius: 50%;
   overflow: hidden;
-  border: 1px solid var(--line);
-  background: var(--surface);
+  /* Feathered edge so the photo dissolves into the orb's glow instead of ending on a line. */
+  mask-image: radial-gradient(circle closest-side, #000 80%, transparent 100%);
 }
 .slide {
   position: absolute;
@@ -329,7 +326,7 @@ em { font-style: italic; }
   align-items: center;
   justify-content: center;
   gap: 14px;
-  padding: 48px 36px 96px;
+  padding: 18% 18% 30%;
   box-sizing: border-box;
   text-align: center;
   opacity: 0;
@@ -343,6 +340,7 @@ em { font-style: italic; }
 .slide:nth-child(4) { background: linear-gradient(170deg, #DCD4B8 0%, #ECDCC4 55%, #F4E6D2 100%); }
 .slide__media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .slide__play {
+  flex: none;
   width: 76px;
   height: 76px;
   border-radius: 50%;
@@ -354,13 +352,19 @@ em { font-style: italic; }
 }
 
 .placeholder-label { font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 400; }
+/* The photo circle is too small on phones for the shooting hint; keep icon and label. */
+@media (max-width: 480px) {
+  .slide { gap: 10px; }
+  .slide .placeholder-hint { display: none; }
+  .slide .placeholder-label { font-size: 12px; letter-spacing: 0.16em; }
+}
 .placeholder-hint { font-size: 15px; color: var(--ink-soft); max-width: 250px; }
 
 .carousel__controls {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 18px;
+  bottom: 15%;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -24,7 +24,8 @@ class Slide:
     kind: str  # "Video" or "Photo"
     label: str
     hint: str
-    src: str | None = None  # path under /static once the real media exists
+    # Path relative to src/ashley_web/static/, e.g. "media/portrait.jpg".
+    src: str | None = None
 
     @property
     def is_video(self) -> bool:
@@ -62,7 +63,12 @@ SLIDES = (
         "Mini video",
         "A 10 to 20 second loop: slow movement, breath, hands, candlelight. Muted and looping",
     ),
-    Slide("Photo", "Portrait", "Seated or standing pose in soft dawn light, 3:4 portrait"),
+    Slide(
+        "Photo",
+        "Portrait",
+        "Seated or standing pose in soft dawn light, 3:4 portrait",
+        src="media/ash1.jpg",
+    ),
     Slide("Photo", "Gathering", "A circle on mats with candles and warm faces"),
     Slide("Photo", "Nature", "Practice outdoors, by water or under trees"),
 )
