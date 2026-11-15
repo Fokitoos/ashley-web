@@ -13,6 +13,7 @@ from ashley_web.booking import (
     month_availability,
     slots_for,
 )
+from ashley_web.orders import OrderStore
 
 TODAY = date(2026, 11, 13)  # a Friday
 MONDAY = "2026-11-16"
@@ -20,8 +21,9 @@ MONDAY = "2026-11-16"
 
 @pytest.fixture
 def client(tmp_path: Path) -> TestClient:
-    store = BookingStore(tmp_path / "bookings.sqlite3")
-    return TestClient(create_app(store=store, today=lambda: TODAY))
+    db = tmp_path / "bookings.sqlite3"
+    app = create_app(store=BookingStore(db), today=lambda: TODAY, orders=OrderStore(db))
+    return TestClient(app)
 
 
 def booking(**overrides: object) -> dict[str, object]:

@@ -238,7 +238,44 @@ function initBooking(root) {
   navigate(null);
 }
 
+/* ---------- Session shop ---------- */
+
+// Mirrors format_euros in orders.py: 4200 -> "€42", 4250 -> "€42.50".
+const euros = (cents) => `€${cents % 100 ? (cents / 100).toFixed(2) : cents / 100}`;
+
+function initCheckout(form) {
+  const quantity = form.elements.quantity;
+  const total = form.querySelector('[data-total]');
+  const steppers = [...form.querySelectorAll('[data-quantity-step]')];
+  const min = Number(quantity.min);
+  const max = Number(quantity.max);
+  const count = () => Math.min(max, Math.max(min, Math.round(Number(quantity.value)) || min));
+
+  const render = () => {
+    const session = form.querySelector('input[name="session"]:checked');
+    total.textContent = euros(count() * Number(session.dataset.priceCents));
+    steppers.forEach((button) => {
+      button.disabled = count() + Number(button.dataset.quantityStep) < min
+        || count() + Number(button.dataset.quantityStep) > max;
+    });
+  };
+
+  steppers.forEach((button) => button.addEventListener('click', () => {
+    quantity.value = count() + Number(button.dataset.quantityStep);
+    render();
+  }));
+  quantity.addEventListener('change', () => { quantity.value = count(); });
+  form.addEventListener('input', render);
+
+  // The total is computed here for display only; the server prices the order itself.
+  form.querySelector('[data-total-row]').hidden = false;
+  render();
+  // After a rejected submission the page reloads at the top; bring the reason into view.
+  form.querySelector('.form-error')?.scrollIntoView({ block: 'center' });
+}
+
 document.querySelectorAll('[data-site-bar]').forEach(initSiteBar);
+document.querySelectorAll('[data-checkout]').forEach(initCheckout);
 document.querySelectorAll('[data-orb]').forEach(initOrb);
 document.querySelectorAll('[data-carousel]').forEach(initCarousel);
 document.querySelectorAll('[data-booking]').forEach(initBooking);

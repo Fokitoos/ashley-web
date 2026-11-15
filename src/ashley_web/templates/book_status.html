@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% import "_macros.html" as ui %}
+
+{% block title %}Your booking · {{ site.name }} Yoga{% endblock %}
+
+{% block head %}
+{% if retry %}<meta http-equiv="refresh" content="5; url={{ retry }}">{% endif %}
+<meta name="robots" content="noindex">
+{% endblock %}
+
+{% block content %}
+{% include "sections/header.html" %}
+
+<div class="aura-wrap">
+  {{ ui.aura("book", 3) }}
+
+  <main class="container section">
+    <div class="card confirmation" role="status">
+      {% if order is none %}
+      <h1 class="confirmation__title">We could not find that <em>booking.</em></h1>
+      <p class="muted confirmation__note">The link may be incomplete. If you have paid and are unsure, get in touch at {{ site.email }} and we will sort it out.</p>
+      <a class="btn btn--ghost" href="{{ url_for('shop') }}">Book a session</a>
+
+      {% elif order.is_paid %}
+      <svg aria-hidden="true" width="64" height="64" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="22"></circle><circle cx="24" cy="24" r="16" stroke-dasharray="1 5"></circle><path d="M16 24.5l5.5 5.5L32.5 19"></path></svg>
+      <h1 class="confirmation__title">Thank you, <em>{{ order.name.split()[0] }}.</em></h1>
+      <p class="confirmation__when">Your payment of <span class="accent">{{ order.total_cents|euros }}</span> for <span class="accent">{{ order.quantity }} × {{ order.title }}</span> ({{ order.minutes }} minutes each) has been received.</p>
+      <p class="muted confirmation__note">I will email you at {{ order.email }} to arrange {{ "a time" if order.quantity == 1 else "your times" }}. Your order number is {{ order.number }}.</p>
+      <a class="btn btn--ghost" href="/">Back to the site</a>
+
+      {% elif order.is_final %}
+      <h1 class="confirmation__title">The payment was not <em>completed.</em></h1>
+      <p class="confirmation__when">No money has been taken for your {{ order.quantity }} × {{ order.title }}.</p>
+      <p class="muted confirmation__note">You are welcome to try again whenever you are ready.</p>
+      <a class="btn btn--primary" href="{{ url_for('shop') }}">Try again</a>
+
+      {% else %}
+      <h1 class="confirmation__title">Your payment is being <em>processed.</em></h1>
+      <p class="confirmation__when">{{ order.quantity }} × {{ order.title }} · {{ order.total_cents|euros }}</p>
+      {% if retry %}
+      <p class="muted confirmation__note">This usually takes a few moments. This page checks again by itself.</p>
+      {% else %}
+      <p class="muted confirmation__note">It is taking longer than usual. You can close this page: once the payment arrives I will email you at {{ order.email }}. Your order number is {{ order.number }}.</p>
+      <a class="btn btn--ghost" href="{{ request.url.path }}?order={{ order.token }}">Check again</a>
+      {% endif %}
+      {% endif %}
+    </div>
+  </main>
+</div>
+
+{% include "sections/footer.html" %}
+{% endblock %}

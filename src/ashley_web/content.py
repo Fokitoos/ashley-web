@@ -53,6 +53,20 @@ class Offering:
     body: str
     detail: str
     price: str = "[PRICE]"
+    # Slug of the SessionType visitors can buy for this offering; adds a "Book now" button.
+    session: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class SessionType:
+    """A paid session visitors can buy on /book. Prices are whole euro cents."""
+
+    slug: str
+    title: str
+    minutes: int
+    price_cents: int
+    summary: str
+    where: str = "Online, by video call"
 
 
 SITE = Site()
@@ -143,11 +157,25 @@ OFFERINGS = (
         "An intuitive card reading for reflection and guidance, for when you are standing at a "
         "threshold and want to hear your own inner voice more clearly.",
         "[LENGTH] · online or in person",
+        price="€42 per online session",
+        session="online-reading",
     ),
     Offering(
         "Therapeutic movement for release",
         "Gentle, intuitive movement, breath and sound that invite the body to soften and let go "
         "of what it has been holding.",
         "[FORMAT & SCHEDULE]",
+    ),
+)
+
+# Sessions sold on /book. Add a SessionType here to offer another one.
+SESSIONS = (
+    SessionType(
+        slug="online-reading",
+        title="Online reading",
+        minutes=60,
+        price_cents=4200,
+        summary="A one-to-one oracle reading by video call: time to bring a question, sit with "
+        "the cards and leave with something to reflect on.",
     ),
 )

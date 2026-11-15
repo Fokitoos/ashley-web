@@ -1,22 +1,22 @@
 """Free-consultation booking: availability rules, validation and storage."""
 
 import calendar
-import re
 import secrets
 import sqlite3
-from collections.abc import Generator, Mapping
-from contextlib import closing, contextmanager
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+
+from ashley_web.storage import SqliteStore
+from ashley_web.validation import FormError, contact, text
 
 WEEKDAY_SLOTS = ("09:00", "10:30", "13:00", "16:30", "18:00", "19:30")
 SATURDAY_SLOTS = ("09:30", "11:00", "12:30")
 MAX_MONTHS_AHEAD = 6
 
 _SATURDAY, _SUNDAY = 5, 6
-_EMAIL = re.compile(r"^\S+@\S+\.\S+$")
-_MAX_NAME, _MAX_EMAIL, _MAX_NOTE = 120, 254, 500
+_MAX_NOTE = 500
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS bookings (
@@ -31,10 +31,6 @@ CREATE TABLE IF NOT EXISTS bookings (
     UNIQUE (day, time)
 )
 """
-
-
-class BookingError(ValueError):
-    """The request is invalid; the message is safe to show to the visitor."""
 
 
 class SlotTakenError(Exception):
@@ -83,48 +79,30 @@ def month_availability(
     return days
 
 
-def _text(payload: Mapping[str, object], key: str) -> str:
-    value = payload.get(key)
-    return value.strip() if isinstance(value, str) else ""
-
-
 def parse_booking(payload: object, today: date) -> BookingRequest:
-    """Validate a submitted booking, raising BookingError with a visitor-facing message."""
+    """Validate a submitted booking, raising FormError with a visitor-facing message."""
     if not isinstance(payload, dict):
-        raise BookingError("Please choose a day and a time first.")
+        raise FormError("Please choose a day and a time first.")
     try:
-        day = date.fromisoformat(_text(payload, "date"))
+        day = date.fromisoformat(text(payload, "date"))
     except ValueError:
-        raise BookingError("Please choose a day and a time first.") from None
-    time = _text(payload, "time")
+        raise FormError("Please choose a day and a time first.") from None
+    time = text(payload, "time")
     if not is_bookable(day, today) or time not in slots_for(day):
-        raise BookingError("Please choose a day and a time first.")
+        raise FormError("Please choose a day and a time first.")
 
-    name = _text(payload, "name")
-    if not name or len(name) > _MAX_NAME:
-        raise BookingError("Please add your name.")
-    email = _text(payload, "email")
-    if not _EMAIL.fullmatch(email) or len(email) > _MAX_EMAIL:
-        raise BookingError("Please add a valid email address.")
-    note = _text(payload, "note")
+    name, email = contact(payload)
+    note = text(payload, "note")
     if len(note) > _MAX_NOTE:
-        raise BookingError(f"Please keep your note under {_MAX_NOTE} characters.")
+        raise FormError(f"Please keep your note under {_MAX_NOTE} characters.")
     return BookingRequest(day=day, time=time, name=name, email=email, note=note)
 
 
-class BookingStore:
+class BookingStore(SqliteStore):
     """SQLite-backed bookings; one consultation per (day, time)."""
 
     def __init__(self, path: Path) -> None:
-        self._path = path
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with self._transaction() as conn:
-            conn.execute(_SCHEMA)
-
-    @contextmanager
-    def _transaction(self) -> Generator[sqlite3.Connection]:
-        with closing(sqlite3.connect(self._path)) as conn, conn:
-            yield conn
+        super().__init__(path, _SCHEMA)
 
     def taken_in_month(self, year: int, month: int) -> dict[str, set[str]]:
         taken: dict[str, set[str]] = {}
