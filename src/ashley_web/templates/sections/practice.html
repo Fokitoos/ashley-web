@@ -1,0 +1,21 @@
+<section id="practice" class="container section section--wide-gap">
+  <div class="section__head">
+    <div class="eyebrow">The practice</div>
+    <h2 class="section__title">Less striving, more <em>listening.</em> Yoga as a quiet conversation with yourself.</h2>
+  </div>
+
+  <div class="pillars">
+    {% for pillar in pillars %}
+    <article class="pillar">
+      <div class="pillar__numeral">{{ pillar.numeral }}</div>
+      <h3 class="heading-3">{{ pillar.title }}</h3>
+      <p class="muted">{{ pillar.body }}</p>
+    </article>
+    {% endfor %}
+  </div>
+
+  <figure class="quote">
+    <blockquote>“[A line in your own words: what yoga means to you, or what you hope every student feels when they roll up their mat.]”</blockquote>
+    <figcaption>{{ site.name }}</figcaption>
+  </figure>
+</section>

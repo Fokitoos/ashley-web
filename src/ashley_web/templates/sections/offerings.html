@@ -1,0 +1,20 @@
+<section id="offerings" class="band">
+  <div class="container section">
+    <div class="section__head">
+      <div class="eyebrow">Offerings</div>
+      <h2 class="section__title">Ways to practise <em>together.</em></h2>
+    </div>
+
+    <div class="offerings">
+      {% for offering in offerings %}
+      <article class="offering">
+        <h3 class="heading-3 offering__title">{{ ui.star() }}<span>{{ offering.title }}</span></h3>
+        <p class="muted offering__body">{{ offering.body }}</p>
+        <div class="offering__meta"><span>{{ offering.detail }}</span><span class="offering__price">{{ offering.price }}</span></div>
+      </article>
+      {% endfor %}
+    </div>
+
+    <p class="offerings__nudge">Not sure where to begin? <a class="accent" href="#book">Start with a free consultation</a> and we’ll find the right fit together.</p>
+  </div>
+</section>

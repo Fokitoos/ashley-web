@@ -1,0 +1,21 @@
+<footer class="site-footer">
+  <div class="container site-footer__cols">
+    <div class="site-footer__brand">
+      <div class="wordmark wordmark--footer">{{ ui.wordmark(site) }}</div>
+      <p>Gatherings, yoga, oracle readings and movement for release, in {{ site.city }} and online.</p>
+    </div>
+    <div class="site-footer__col">
+      <div class="step-label">Get in touch</div>
+      <span>{{ site.email }}</span>
+      <span>{{ site.phone }}</span>
+      <span>Instagram: {{ site.instagram }}</span>
+    </div>
+    <div class="site-footer__col">
+      <div class="step-label">Explore</div>
+      <a href="#practice">The practice</a>
+      <a href="#offerings">Offerings</a>
+      <a href="#book">Free consultation</a>
+    </div>
+  </div>
+  <div class="container site-footer__legal">© {{ year }} {{ site.name }}. Namaste.</div>
+</footer>

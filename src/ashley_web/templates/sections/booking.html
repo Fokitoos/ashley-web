@@ -1,0 +1,71 @@
+<div class="aura-wrap">
+  {{ ui.aura("book", 3) }}
+
+  <section id="book" class="container section" data-booking>
+    <div class="section__head">
+      <div class="eyebrow">Free online consultation</div>
+      <h2 class="section__title">Begin with a <em>conversation.</em></h2>
+      <p class="muted section__intro section__intro--wide">Thirty minutes by video call, free of charge. We’ll talk about where you are, what you’re looking for, and whether we’re a good fit. No mat required.</p>
+    </div>
+
+    <form class="card picker" data-picker novalidate>
+      <div class="picker__col picker__col--calendar">
+        <div class="cal__bar">
+          <div class="step-label">1 · Choose a day</div>
+          <div class="cal__nav">
+            <button class="icon-btn" type="button" aria-label="Previous month" data-prev-month disabled>{{ ui.chevron("left", 18) }}</button>
+            <div class="cal__month" aria-live="polite" data-month-label>&nbsp;</div>
+            <button class="icon-btn" type="button" aria-label="Next month" data-next-month disabled>{{ ui.chevron("right", 18) }}</button>
+          </div>
+        </div>
+        <div class="cal__grid cal__weekdays" aria-hidden="true">
+          <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+        </div>
+        <div class="cal__grid" data-days></div>
+        <div class="cal__legend">
+          <span><span class="swatch" aria-hidden="true"></span>Available</span>
+          <span><span class="swatch swatch--selected" aria-hidden="true"></span>Selected</span>
+          <span>Monday to Saturday</span>
+        </div>
+      </div>
+
+      <div class="picker__col picker__col--details">
+        <div class="stack">
+          <div class="step-label">2 · Choose a time</div>
+          <p class="times__empty" data-no-date>Pick a day on the calendar to see open times.</p>
+          <div class="times" data-times hidden>
+            <div class="times__date" data-date-label></div>
+            <div class="times__slots" data-slots></div>
+            <div class="times__note">30 minutes · video call · times shown in {{ site.time_zone }}</div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="step-label">3 · Your details</div>
+          <div class="field">
+            <label for="bk-name">Name</label>
+            <input id="bk-name" name="name" type="text" autocomplete="name" placeholder="Your name" maxlength="120">
+          </div>
+          <div class="field">
+            <label for="bk-email">Email</label>
+            <input id="bk-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="254">
+          </div>
+          <div class="field">
+            <label for="bk-note">What brings you to yoga? (optional)</label>
+            <input id="bk-note" name="note" type="text" placeholder="A few words is plenty" maxlength="500">
+          </div>
+          <p class="form-error" role="alert" data-error hidden></p>
+          <button class="btn btn--primary btn--submit" type="submit">Confirm free consultation</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="card confirmation" role="status" data-confirmation hidden>
+      <svg aria-hidden="true" width="64" height="64" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="22"></circle><circle cx="24" cy="24" r="16" stroke-dasharray="1 5"></circle><path d="M16 24.5l5.5 5.5L32.5 19"></path></svg>
+      <h3 class="confirmation__title">Thank you, <em data-first-name>friend</em><em>.</em></h3>
+      <p class="confirmation__when">Your free consultation is set for <span class="accent" data-when></span>.</p>
+      <p class="muted confirmation__note">Your details are saved and a confirmation will follow at <span data-email></span>. Until then, breathe easy.</p>
+      <button class="btn btn--ghost" type="button" data-reset>Choose a different time</button>
+    </div>
+  </section>
+</div>
