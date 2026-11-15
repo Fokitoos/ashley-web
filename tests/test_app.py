@@ -4,7 +4,8 @@ from pathlib import Path
 import pytest
 from starlette.testclient import TestClient
 
-from ashley_web.app import create_app
+from ashley_web import content
+from ashley_web.app import PACKAGE_DIR, create_app
 from ashley_web.booking import (
     SATURDAY_SLOTS,
     WEEKDAY_SLOTS,
@@ -61,6 +62,16 @@ def test_home_page_renders_every_section(client: TestClient) -> None:
 def test_static_assets_are_served(client: TestClient) -> None:
     assert client.get("/static/css/site.css").status_code == 200
     assert client.get("/static/js/site.js").status_code == 200
+
+
+def test_media_paths_point_at_real_static_files(client: TestClient) -> None:
+    sources = [m.src for m in (*content.SLIDES, *content.PORTFOLIO) if m.src]
+    for src in sources:
+        assert not src.startswith(("/", "static/", "src/")), (
+            f"{src!r}: give the path relative to src/ashley_web/static/, e.g. 'media/photo.jpg'"
+        )
+        assert (PACKAGE_DIR / "static" / src).is_file(), f"{src!r} is not in src/ashley_web/static/"
+        assert client.get(f"/static/{src}").status_code == 200
 
 
 def test_availability_defaults_to_the_current_month(client: TestClient) -> None:
