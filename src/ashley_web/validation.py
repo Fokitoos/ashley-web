@@ -16,12 +16,17 @@ def text(payload: Mapping[str, object], key: str) -> str:
     return value.strip() if isinstance(value, str) else ""
 
 
+def email_address(payload: Mapping[str, object]) -> str:
+    """The visitor's email address, validated."""
+    email = text(payload, "email")
+    if not _EMAIL.fullmatch(email) or len(email) > _MAX_EMAIL:
+        raise FormError("Please add a valid email address.")
+    return email
+
+
 def contact(payload: Mapping[str, object]) -> tuple[str, str]:
     """The visitor's name and email address, validated."""
     name = text(payload, "name")
     if not name or len(name) > _MAX_NAME:
         raise FormError("Please add your name.")
-    email = text(payload, "email")
-    if not _EMAIL.fullmatch(email) or len(email) > _MAX_EMAIL:
-        raise FormError("Please add a valid email address.")
-    return name, email
+    return name, email_address(payload)

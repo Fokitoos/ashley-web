@@ -41,6 +41,24 @@ Each order is saved in the `orders` table with its status (`open`, `paid`, `canc
 `expired`, `failed`). The site does not send emails: paid orders appear in the Mollie
 dashboard, with the order number, name and email in the payment's description and metadata.
 
+## Free ebook pop-up
+
+The first time someone opens the home page, a pop-up offers a free ebook in exchange for
+their email address. It appears once per visitor (remembered in the browser's
+`localStorage` under `ebook-offer-seen`), and never on the `/book` pages. To see it again
+while working on it, open the site in a private window.
+
+Set the ebook up in `EBOOK` in `content.py`: its title, a short blurb, and optionally
+`file` and `cover` (paths under `static/`). With `file` set, the visitor gets a download
+button straight away; without it, the pop-up says the ebook is on its way by email, and
+sending it is up to you. The site itself sends no email.
+
+Addresses are saved in the `ebook_requests` table:
+
+```sh
+sqlite3 data/bookings.sqlite3 "SELECT email, created_at FROM ebook_requests"
+```
+
 ## Check
 
 ```sh
@@ -56,10 +74,11 @@ uv run pytest
 | `src/ashley_web/content.py` | All copy and settings: name, contact details, accent colour, gradient, slides, offerings. Anything in `[SQUARE BRACKETS]` is a placeholder to fill in. |
 | `src/ashley_web/booking.py` | Consultation hours (`WEEKDAY_SLOTS`, `SATURDAY_SLOTS`), validation, SQLite store. |
 | `src/ashley_web/orders.py` | Paid-session orders: validation, `MAX_QUANTITY`, SQLite store. |
+| `src/ashley_web/ebook.py` | SQLite store for the email addresses left for the free ebook. |
 | `src/ashley_web/payments.py` | The Mollie gateway (create a payment, look up its status). |
-| `src/ashley_web/app.py` | Routes: `/`, `/book`, `/book/thanks`, `GET /api/availability`, `POST /api/bookings`, `POST /api/payments/webhook`. |
+| `src/ashley_web/app.py` | Routes: `/`, `/book`, `/book/thanks`, `GET /api/availability`, `POST /api/bookings`, `POST /api/ebook`, `POST /api/payments/webhook`. |
 | `src/ashley_web/templates/` | `base.html`, `index.html`, `book.html`, `book_status.html`, one partial per section, shared macros. |
-| `src/ashley_web/static/` | `css/site.css` (design tokens at the top) and `js/site.js` (carousel, booking picker, session quantity). |
+| `src/ashley_web/static/` | `css/site.css` (design tokens at the top) and `js/site.js` (carousel, booking picker, session quantity, ebook pop-up). |
 
 To use real photos or video, drop the files under `static/` and set `src` on the matching
 `Slide` or `PortfolioItem` in `content.py`.

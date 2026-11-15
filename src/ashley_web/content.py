@@ -69,7 +69,21 @@ class SessionType:
     where: str = "Online, by video call"
 
 
+@dataclass(frozen=True, slots=True)
+class Ebook:
+    """The free ebook offered in the welcome pop-up in exchange for an email address."""
+
+    title: str = "[EBOOK TITLE]"
+    blurb: str = "[One or two lines about what is inside and who it is for.]"
+    # Paths relative to src/ashley_web/static/, e.g. "media/ebook.pdf". With `file` set,
+    # visitors get a download button as soon as they leave their email; without it they are
+    # told the ebook will be emailed to them, which you then do yourself.
+    file: str | None = None
+    cover: str | None = None
+
+
 SITE = Site()
+EBOOK = Ebook()
 
 SLIDES = (
     Slide(

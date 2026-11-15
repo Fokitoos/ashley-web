@@ -9,6 +9,7 @@ from starlette.testclient import TestClient
 from ashley_web import content
 from ashley_web.app import create_app
 from ashley_web.booking import BookingStore
+from ashley_web.ebook import EbookRequestStore
 from ashley_web.orders import MAX_QUANTITY, OrderStore, format_euros
 from ashley_web.payments import Payment, PaymentError
 
@@ -70,6 +71,7 @@ def make_client(
         orders=orders,
         gateway=gateway,
         public_url=public_url,
+        ebook_requests=EbookRequestStore(tmp_path / "bookings.sqlite3"),
     )
     return TestClient(app, follow_redirects=False)
 

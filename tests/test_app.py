@@ -13,6 +13,7 @@ from ashley_web.booking import (
     month_availability,
     slots_for,
 )
+from ashley_web.ebook import EbookRequestStore
 from ashley_web.orders import OrderStore
 
 TODAY = date(2026, 11, 13)  # a Friday
@@ -22,7 +23,12 @@ MONDAY = "2026-11-16"
 @pytest.fixture
 def client(tmp_path: Path) -> TestClient:
     db = tmp_path / "bookings.sqlite3"
-    app = create_app(store=BookingStore(db), today=lambda: TODAY, orders=OrderStore(db))
+    app = create_app(
+        store=BookingStore(db),
+        today=lambda: TODAY,
+        orders=OrderStore(db),
+        ebook_requests=EbookRequestStore(db),
+    )
     return TestClient(app)
 
 
@@ -68,6 +74,7 @@ def test_static_assets_are_served(client: TestClient) -> None:
 
 def test_media_paths_point_at_real_static_files(client: TestClient) -> None:
     sources = [m.src for m in (*content.SLIDES, *content.PORTFOLIO) if m.src]
+    sources += [path for path in (content.EBOOK.file, content.EBOOK.cover) if path]
     for src in sources:
         assert not src.startswith(("/", "static/", "src/")), (
             f"{src!r}: give the path relative to src/ashley_web/static/, e.g. 'media/photo.jpg'"

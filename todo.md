@@ -80,3 +80,17 @@ services online in the Netherlands and are usually looked at during Mollie's rev
 - [ ] A private page listing orders, so you do not depend on the Mollie dashboard.
 - [ ] More session types: add a `SessionType` to `SESSIONS` and name its slug in the
       matching offering's `session=`.
+
+# Finishing the free ebook pop-up
+
+The pop-up on the home page is built; these parts need you.
+
+- [ ] Put the ebook file under `src/ashley_web/static/media/` and set `file=` in `EBOOK`
+      in `content.py`. Until then the pop-up says the ebook is "on its way" by email, and
+      you have to send it by hand to each address in the `ebook_requests` table.
+- [ ] Fill in the ebook's `title` and `blurb` in `EBOOK` (both are placeholders now), and
+      optionally a `cover` image for the left side of the pop-up.
+- [ ] Decide what the collected addresses are for. The pop-up promises "Your email is only
+      used to send you the ebook". If you also want to send a newsletter, that wording has
+      to change and visitors have to agree to it explicitly; mention it in the privacy
+      statement too.

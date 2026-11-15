@@ -25,9 +25,10 @@ from ashley_web.booking import (
     months_ahead,
     parse_booking,
 )
+from ashley_web.ebook import EbookRequestStore
 from ashley_web.orders import MAX_QUANTITY, Order, OrderStore, format_euros, parse_order
 from ashley_web.payments import MollieGateway, PaymentError, PaymentGateway
-from ashley_web.validation import FormError
+from ashley_web.validation import FormError, email_address
 
 PACKAGE_DIR = Path(__file__).parent
 DEFAULT_DB = Path("data/bookings.sqlite3")
@@ -57,6 +58,7 @@ def create_app(
     orders: OrderStore | None = None,
     gateway: PaymentGateway | None = None,
     public_url: str | None = None,
+    ebook_requests: EbookRequestStore | None = None,
 ) -> Starlette:
     """Build the app.
 
@@ -67,6 +69,7 @@ def create_app(
     db_path = Path(os.environ.get("ASHLEY_WEB_DB", DEFAULT_DB))
     bookings = store or BookingStore(db_path)
     orders = orders or OrderStore(db_path)
+    ebook_requests = ebook_requests or EbookRequestStore(db_path)
     gateway = gateway or gateway_from_env()
     public_url = (public_url or os.environ.get("ASHLEY_WEB_PUBLIC_URL", "")).rstrip("/")
 
@@ -93,6 +96,7 @@ def create_app(
                 "portfolio": content.PORTFOLIO,
                 "offerings": content.OFFERINGS,
                 "sessions": {session.slug: session for session in content.SESSIONS},
+                "ebook": content.EBOOK,
             },
         )
 
@@ -135,6 +139,21 @@ def create_app(
             {"token": token, "date": booking.day.isoformat(), "time": booking.time},
             status_code=201,
         )
+
+    async def request_ebook(request: Request) -> Response:
+        """Save the visitor's email; the reply says where to download the ebook, if anywhere."""
+        try:
+            payload = json.loads(await request.body())
+        except ValueError:
+            return JSONResponse({"error": "Something went wrong. Please try again."}, 400)
+        try:
+            email = email_address(payload if isinstance(payload, dict) else {})
+        except FormError as exc:
+            return JSONResponse({"error": str(exc)}, status_code=422)
+        ebook_requests.add(email)
+        file = content.EBOOK.file
+        download = str(request.url_for("static", path=file)) if file else None
+        return JSONResponse({"download": download}, status_code=201)
 
     def shop_page(
         request: Request,
@@ -238,6 +257,7 @@ def create_app(
             Route("/book/thanks", order_status, name="order_status"),
             Route("/api/availability", availability),
             Route("/api/bookings", book, methods=["POST"]),
+            Route("/api/ebook", request_ebook, methods=["POST"]),
             Route(
                 "/api/payments/webhook", payment_webhook, methods=["POST"], name="payment_webhook"
             ),

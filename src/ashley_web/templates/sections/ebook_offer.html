@@ -1,0 +1,43 @@
+{# Welcome pop-up offering the free ebook. site.js opens it once per visitor. #}
+<dialog class="offer" aria-labelledby="offer-title" data-ebook-offer>
+  <div class="offer__panel">
+    <button class="icon-btn offer__close" type="button" aria-label="Close" data-offer-close>
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"></path></svg>
+    </button>
+
+    <div class="offer__art" aria-hidden="true">
+      {% if ebook.cover %}
+      <img class="offer__cover" src="{{ url_for('static', path=ebook.cover) }}" alt="">
+      {% else %}
+      <div class="offer__glow"></div>
+      <svg class="offer__book" width="92" height="92" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M24 13c-4-3-9-4-15-4v26c6 0 11 1 15 4 4-3 9-4 15-4V9c-6 0-11 1-15 4z"></path><path d="M24 13v26"></path><path d="M14 16.5c2 .2 4 .7 6 1.6M14 22.5c2 .2 4 .7 6 1.6M34 16.5c-2 .2-4 .7-6 1.6M34 22.5c-2 .2-4 .7-6 1.6"></path></svg>
+      <div class="offer__stars">{{ ui.star() }}{{ ui.star() }}{{ ui.star() }}</div>
+      {% endif %}
+    </div>
+
+    <div class="offer__body" data-offer-ask>
+      <div class="eyebrow">A free gift</div>
+      <h2 class="offer__title" id="offer-title">Something to take <em>with you.</em></h2>
+      <p class="muted">Leave your email and receive my free ebook, <strong>{{ ebook.title }}</strong>. {{ ebook.blurb }}</p>
+      <form class="offer__form" novalidate data-offer-form>
+        <div class="field">
+          <label for="offer-email">Email</label>
+          <input id="offer-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="254">
+        </div>
+        <p class="form-error" role="alert" data-offer-error hidden></p>
+        <button class="btn btn--primary" type="submit">Send me the ebook</button>
+      </form>
+      <button class="offer__decline" type="button" data-offer-close>No, thank you</button>
+      <p class="offer__note">Your email is only used to send you the ebook.</p>
+    </div>
+
+    <div class="offer__body offer__body--done" role="status" data-offer-done hidden>
+      <svg class="offer__check" aria-hidden="true" width="56" height="56" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="22"></circle><circle cx="24" cy="24" r="16" stroke-dasharray="1 5"></circle><path d="M16 24.5l5.5 5.5L32.5 19"></path></svg>
+      <h2 class="offer__title">Thank <em>you.</em></h2>
+      <p class="muted" data-offer-ready hidden>Your copy of <strong>{{ ebook.title }}</strong> is ready.</p>
+      <p class="muted offer__sent" data-offer-sent hidden>Your copy of <strong>{{ ebook.title }}</strong> is on its way to <span data-offer-email></span>.</p>
+      <a class="btn btn--primary" data-offer-download download hidden>Download the ebook</a>
+      <button class="btn btn--ghost" type="button" data-offer-close>Back to the site</button>
+    </div>
+  </div>
+</dialog>

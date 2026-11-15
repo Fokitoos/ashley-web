@@ -274,7 +274,70 @@ function initCheckout(form) {
   form.querySelector('.form-error')?.scrollIntoView({ block: 'center' });
 }
 
+/* ---------- Ebook offer (welcome pop-up) ---------- */
+
+const OFFER_SEEN_KEY = 'ebook-offer-seen';
+const OFFER_DELAY_MS = 1500;
+
+function initEbookOffer(dialog) {
+  // Shown once per visitor. Private windows can refuse storage; then it shows once per visit.
+  const storage = {
+    get seen() { try { return localStorage.getItem(OFFER_SEEN_KEY) !== null; } catch { return false; } },
+    markSeen() { try { localStorage.setItem(OFFER_SEEN_KEY, new Date().toISOString()); } catch { /* ignore */ } },
+  };
+  if (storage.seen || typeof dialog.showModal !== 'function') return;
+
+  const $ = (name) => dialog.querySelector(`[data-offer-${name}]`);
+  const form = $('form');
+  const error = $('error');
+  const submit = form.querySelector('[type="submit"]');
+
+  dialog.querySelectorAll('[data-offer-close]').forEach((button) => {
+    button.addEventListener('click', () => dialog.close());
+  });
+  // A click on the dimmed page behind lands on the dialog element itself.
+  dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const email = form.elements.email.value.trim();
+    error.hidden = true;
+    submit.disabled = true;
+    let message = 'Something went wrong. Please try again.';
+    try {
+      const response = await fetch('/api/ebook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        $('email').textContent = email;
+        $('ready').hidden = !data.download;
+        $('sent').hidden = Boolean(data.download);
+        if (data.download) {
+          $('download').href = data.download;
+          $('download').hidden = false;
+        }
+        $('ask').hidden = true;
+        $('done').hidden = false;
+        return;
+      }
+      message = data.error || message;
+    } catch { /* network trouble: keep the generic message */ }
+    error.textContent = message;
+    error.hidden = false;
+    submit.disabled = false;
+  });
+
+  setTimeout(() => {
+    dialog.showModal();
+    storage.markSeen();
+  }, OFFER_DELAY_MS);
+}
+
 document.querySelectorAll('[data-site-bar]').forEach(initSiteBar);
+document.querySelectorAll('[data-ebook-offer]').forEach(initEbookOffer);
 document.querySelectorAll('[data-checkout]').forEach(initCheckout);
 document.querySelectorAll('[data-orb]').forEach(initOrb);
 document.querySelectorAll('[data-carousel]').forEach(initCarousel);
